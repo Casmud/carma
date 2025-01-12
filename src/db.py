@@ -1,23 +1,15 @@
-from datetime import datetime
+from models import fuel, part, invoice, general
 
-from sqlmodel import Field, SQLModel, create_engine
-
-
-class Invoice(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    date: datetime
-    company_id: int
-    reference: str
-
-class Company(SQLModel, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-    friendly_name: str
-    full_name: str
-    adress: str
+from sqlmodel import SQLModel, create_engine
 
 sqlite_file_name = "database.db"
 sqlite_url = f"sqlite:///{sqlite_file_name}"
 
 engine = create_engine(sqlite_url, echo=True)
 
-SQLModel.metadata.create_all(engine)
+
+def create_db_and_tables():
+    SQLModel.metadata.create_all(engine)
+
+if __name__ == "__main__":
+    create_db_and_tables()
