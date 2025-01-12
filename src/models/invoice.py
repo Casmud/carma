@@ -1,5 +1,7 @@
 from sqlmodel import Field, SQLModel, Relationship
 from datetime import datetime
+from src.models.general import Company
+from src.models.part import Part
 
 class Invoice(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
@@ -10,8 +12,10 @@ class Invoice(SQLModel, table=True):
     milage: int | None = None
 
     company_id: int | None = Field(default=None, foreign_key="company.id")
-    items: list["InvoiceItem"] = Relationship(back_populates="invoiceitem", cascade_delete=True)
-    scans: list["PdfScan"] = Relationship(back_populates="pdfscan", cascade_delete=True)
+    company: Company = Relationship()
+
+    items: list["InvoiceItem"] = Relationship(back_populates="invoice", cascade_delete=True)
+    scans: list["PdfScan"] | None = Relationship(back_populates="invoice", cascade_delete=True)
 
 class InvoiceItem(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
@@ -23,7 +27,13 @@ class InvoiceItem(SQLModel, table=True):
     description: str | None = None
 
     invoice_id: int | None = Field(default=None, foreign_key="invoice.id", ondelete="CASCADE")
+    invoice: Invoice = Relationship(back_populates="items")
+
     part_id: int | None = Field(default=None, foreign_key="part.id")
+    part: Part = Relationship()
+
+    def crate_invoice_item(self):
+        pass
 
 class PdfScan(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
@@ -31,3 +41,4 @@ class PdfScan(SQLModel, table=True):
     url: str
 
     invoice_id: int | None = Field(default=None, foreign_key="invoice.id")
+    invoice: Invoice = Relationship(back_populates="scans")
