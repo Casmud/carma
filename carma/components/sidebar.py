@@ -29,8 +29,9 @@ def sidebar_item(
 
 def sidebar_items() -> rx.Component:
     return rx.vstack(
-        sidebar_item("Dashboard", "layout-dashboard", "/#"),
-        sidebar_item("Facturen", "square-library", "/#"),
+        sidebar_item("Home", "layout-dashboard", "/"),
+        sidebar_item("Facturen (mock)", "square-library", "/invoices"),
+        sidebar_item("Companies", "building", "/company"),
         spacing="1",
         width="100%",
     )

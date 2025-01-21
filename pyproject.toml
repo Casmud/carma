@@ -5,6 +5,6 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
-    "reflex>=0.6.7",
+    "reflex>=0.6.8",
     "sqlmodel>=0.0.22",
 ]
