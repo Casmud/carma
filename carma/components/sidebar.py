@@ -32,6 +32,7 @@ def sidebar_items() -> rx.Component:
         sidebar_item("Home", "layout-dashboard", "/"),
         sidebar_item("Facturen (mock)", "square-library", "/invoices"),
         sidebar_item("Companies", "building", "/company"),
+        sidebar_item("Fuel", "fuel", "/fuel"),
         spacing="1",
         width="100%",
     )

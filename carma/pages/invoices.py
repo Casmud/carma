@@ -4,7 +4,7 @@ from ..template import template
 
 @rx.page(route="/invoices")
 @template
-def index() -> rx.Component:
+def invoice_page() -> rx.Component:
     # Order pagina
     return rx.container(
         rx.vstack(

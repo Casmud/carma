@@ -1,9 +1,10 @@
 from .pages import (
-    index,company, invoices
+    index,company, invoices, fuel
 )
 
 __all__ = [
     "index",
     "company",
-    "invoices"
+    "invoices",
+    "fuel"
 ]

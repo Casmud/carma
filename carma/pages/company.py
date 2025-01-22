@@ -81,9 +81,11 @@ def show_company(company: Company):
 
 @rx.page(route="/company", on_load=State.load_companies)
 @template
-def company() -> rx.Component:
-    return rx.vstack(
+def company_page() -> rx.Component:
+    return rx.container(
+        rx.vstack(
         company_form(),
         rx.heading("Current companies:"),
         company_table()
+    )
     )
