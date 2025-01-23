@@ -1,4 +1,4 @@
-from sqlmodel import Field, SQLModel, Relationship
+from sqlmodel import Field, Relationship
 from datetime import timedelta
 import reflex as rx
 

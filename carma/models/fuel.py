@@ -1,4 +1,4 @@
-from sqlmodel import Field, SQLModel, Relationship
+from sqlmodel import Field, Relationship
 from datetime import datetime
 from carma.models.general import Company
 import reflex as rx

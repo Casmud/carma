@@ -1,4 +1,4 @@
-from sqlmodel import Field, SQLModel, Relationship
+from sqlmodel import Field, Relationship
 from datetime import datetime
 from src.models.general import Company
 from src.models.part import Part
