@@ -1,10 +1,9 @@
 import reflex as rx
 from reflex.style import set_color_mode, color_mode
 
+
 def navbar_link(text: str, url: str) -> rx.Component:
-    return rx.link(
-        rx.text(text, size="4", weight="medium"), href=url
-    )
+    return rx.link(rx.text(text, size="4", weight="medium"), href=url)
 
 
 def dark_mode_toggle() -> rx.Component:
@@ -27,6 +26,7 @@ def dark_mode_toggle() -> rx.Component:
         value=color_mode,
     )
 
+
 def navbar() -> rx.Component:
     return rx.box(
         rx.desktop_only(
@@ -35,9 +35,7 @@ def navbar() -> rx.Component:
                     rx.avatar(
                         fallback="CM",
                     ),
-                    rx.heading(
-                        "Carma", size="7", weight="bold"
-                    ),
+                    rx.heading("Carma", size="7", weight="bold"),
                     align_items="center",
                 ),
                 rx.hstack(
@@ -70,7 +68,6 @@ def navbar() -> rx.Component:
                 dark_mode_toggle(),
                 justify="between",
                 align_items="center",
-
             ),
         ),
         rx.mobile_and_tablet(
@@ -82,15 +79,11 @@ def navbar() -> rx.Component:
                         height="auto",
                         border_radius="25%",
                     ),
-                    rx.heading(
-                        "Reflex", size="6", weight="bold"
-                    ),
+                    rx.heading("Reflex", size="6", weight="bold"),
                     align_items="center",
                 ),
                 rx.menu.root(
-                    rx.menu.trigger(
-                        rx.icon("menu", size=30)
-                    ),
+                    rx.menu.trigger(rx.icon("menu", size=30)),
                     rx.menu.content(
                         rx.menu.item("Home"),
                         rx.menu.sub(

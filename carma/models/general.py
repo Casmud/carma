@@ -1,6 +1,7 @@
 from sqlmodel import Field, SQLModel
 import reflex as rx
 
+
 class Company(rx.Model, table=True):
     id: int | None = Field(default=None, primary_key=True)
 

@@ -12,7 +12,8 @@ def invoice_page() -> rx.Component:
                 rx.card(
                     rx.data_list.root(
                         rx.data_list.item(
-                            rx.data_list.value(rx.text.strong("Lexus Den Haag"))),
+                            rx.data_list.value(rx.text.strong("Lexus Den Haag"))
+                        ),
                         rx.data_list.item(
                             rx.data_list.label("Datum"),
                             rx.data_list.value("10-07-2021"),
@@ -26,7 +27,8 @@ def invoice_page() -> rx.Component:
                 ),
                 rx.spacer(),
                 rx.avatar(fallback="DW"),
-                width="100%"),
+                width="100%",
+            ),
             rx.table.root(
                 rx.table.header(
                     rx.table.row(
@@ -79,7 +81,7 @@ def invoice_page() -> rx.Component:
                     ),
                 ),
                 width="100%",
-                variant="surface"
-            )
-
-        ))
+                variant="surface",
+            ),
+        )
+    )

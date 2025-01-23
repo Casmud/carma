@@ -3,6 +3,7 @@ from datetime import datetime
 from carma.models.general import Company
 import reflex as rx
 
+
 class Fuel(rx.Model, table=True):
     id: int | None = Field(default=None, primary_key=True)
 
