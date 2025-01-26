@@ -5,7 +5,7 @@ from ..template import template
 @rx.page(route="/invoices")
 @template
 def invoice_page() -> rx.Component:
-    # Order pagina
+    """Page to show invoices."""
     return rx.container(
         rx.vstack(
             rx.hstack(

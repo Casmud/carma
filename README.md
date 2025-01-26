@@ -7,9 +7,15 @@ Use [UV](https://docs.astral.sh/uv/) to install carma.
 
 ```bash
 uv sync
+reflex db init
+reflex db migrate
 ```
 
-## Usage
+## Usage during development
+```bash
+reflex run
+# Browse the displayed front end URL
+```
 
 
 ## Contributing

@@ -1,16 +1,19 @@
-from sqlmodel import Field, Relationship
-from datetime import datetime
-from carma.models.general import Company
-import reflex as rx
+from typing import TYPE_CHECKING
+
+from .base import CarmaBase, Field, Relationship, datetime
+
+if TYPE_CHECKING:
+    from .company import Company
 
 
-class Fuel(rx.Model, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-
+class Fuel(CarmaBase, table=True):
     date: datetime
-    milage: int
+    kilometrage: int
     liters: float
     price: float
-
     company_id: int | None = Field(default=None, foreign_key="company.id")
-    company: Company = Relationship()
+
+    # Relationships are dynamically populated. So they are only available in the
+    # backend in rx.events and not in the frontend. So grab them in an event and
+    # then store them in the State as regular attributes.
+    company: "Company" = Relationship(back_populates="fuels")
