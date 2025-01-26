@@ -6,4 +6,4 @@ from ..template import template
 @template
 def index_page() -> rx.Component:
     # Order pagina
-    return rx.text("Hello World")
+    return rx.text("Hello 🏎️🏎️🏎️🏎️", size="9")

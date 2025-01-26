@@ -389,7 +389,7 @@
         <mxCell id="9Zb1ZSQ6fwhMMuJiFHQt-305" value="" style="shape=image;html=1;verticalAlign=top;verticalLabelPosition=bottom;labelBackgroundColor=#ffffff;imageAspect=0;aspect=fixed;image=https://cdn4.iconfinder.com/data/icons/file-extension-names-vol-8/512/24-128.png" parent="9Zb1ZSQ6fwhMMuJiFHQt-295" vertex="1">
           <mxGeometry x="630" y="17" width="38" height="38" as="geometry" />
         </mxCell>
-        <mxCell id="837YJ99uixyiCSYKJATJ-287" value="Milage not always recorded!" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;fillColor=#fff2cc;strokeColor=#d6b656;" parent="9Zb1ZSQ6fwhMMuJiFHQt-295" vertex="1">
+        <mxCell id="837YJ99uixyiCSYKJATJ-287" value="kilometrage not always recorded!" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;fillColor=#fff2cc;strokeColor=#d6b656;" parent="9Zb1ZSQ6fwhMMuJiFHQt-295" vertex="1">
           <mxGeometry x="372.22" y="-40" width="120" height="80" as="geometry" />
         </mxCell>
         <mxCell id="9Zb1ZSQ6fwhMMuJiFHQt-198" value="" style="verticalLabelPosition=bottom;shadow=0;dashed=0;align=center;html=1;verticalAlign=top;strokeWidth=1;shape=mxgraph.mockup.navigation.scrollBar;strokeColor=#999999;barPos=97.797;fillColor2=#99ddff;strokeColor2=none;direction=north;" parent="9Zb1ZSQ6fwhMMuJiFHQt-306" vertex="1">
@@ -527,7 +527,7 @@
             <mxRectangle width="88" height="40" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="4" value="milage" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=#d79b00;overflow=hidden;fillColor=#ffe6cc;top=0;left=0;bottom=0;right=0;pointerEvents=1;" vertex="1" parent="837YJ99uixyiCSYKJATJ-32">
+        <mxCell id="4" value="kilometrage" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=#d79b00;overflow=hidden;fillColor=#ffe6cc;top=0;left=0;bottom=0;right=0;pointerEvents=1;" vertex="1" parent="837YJ99uixyiCSYKJATJ-32">
           <mxGeometry x="263" width="88" height="40" as="geometry">
             <mxRectangle width="88" height="40" as="alternateBounds" />
           </mxGeometry>
@@ -594,7 +594,7 @@
             <mxRectangle width="88" height="40" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="837YJ99uixyiCSYKJATJ-323" value="milage_interval" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=#d79b00;overflow=hidden;fillColor=#ffe6cc;top=0;left=0;bottom=0;right=0;pointerEvents=1;" parent="837YJ99uixyiCSYKJATJ-83" vertex="1">
+        <mxCell id="837YJ99uixyiCSYKJATJ-323" value="kilometrage_interval" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=#d79b00;overflow=hidden;fillColor=#ffe6cc;top=0;left=0;bottom=0;right=0;pointerEvents=1;" parent="837YJ99uixyiCSYKJATJ-83" vertex="1">
           <mxGeometry x="176" width="88" height="40" as="geometry">
             <mxRectangle width="88" height="40" as="alternateBounds" />
           </mxGeometry>
@@ -672,7 +672,7 @@
             <mxRectangle width="88" height="40" as="alternateBounds" />
           </mxGeometry>
         </mxCell>
-        <mxCell id="2" value="milage" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;" vertex="1" parent="837YJ99uixyiCSYKJATJ-158">
+        <mxCell id="2" value="kilometrage" style="shape=partialRectangle;html=1;whiteSpace=wrap;connectable=0;strokeColor=inherit;overflow=hidden;fillColor=none;top=0;left=0;bottom=0;right=0;pointerEvents=1;" vertex="1" parent="837YJ99uixyiCSYKJATJ-158">
           <mxGeometry x="351" width="88" height="40" as="geometry">
             <mxRectangle width="88" height="40" as="alternateBounds" />
           </mxGeometry>
@@ -779,7 +779,7 @@
         <mxCell id="837YJ99uixyiCSYKJATJ-295" value="SQLModel" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
           <mxGeometry x="1460" y="762.5" width="131.5" height="57.5" as="geometry" />
         </mxCell>
-        <mxCell id="837YJ99uixyiCSYKJATJ-300" value="Milage join with Fuel and Order" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
+        <mxCell id="837YJ99uixyiCSYKJATJ-300" value="kilometrage join with Fuel and Order" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">
           <mxGeometry x="1090" y="-60" width="120" height="80" as="geometry" />
         </mxCell>
         <mxCell id="837YJ99uixyiCSYKJATJ-303" value="BTW?" style="shape=callout;whiteSpace=wrap;html=1;perimeter=calloutPerimeter;fillColor=#fff2cc;strokeColor=#d6b656;" parent="1" vertex="1">

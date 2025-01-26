@@ -1,17 +1,15 @@
 from sqlmodel import Field, Relationship
 from datetime import datetime
-from src.models.general import Company
-from src.models.part import Part
+from .company import Company
+from .part import Part
 import reflex as rx
 
 
 class Invoice(rx.Model, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-
     date: datetime
 
     reference: int | None = None
-    milage: int | None = None
+    kilometrage: int | None = None
 
     company_id: int | None = Field(default=None, foreign_key="company.id")
     company: Company = Relationship()
