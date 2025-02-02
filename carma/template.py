@@ -7,6 +7,7 @@ from .components.template.sidebar import sidebar
 
 def template(page: Callable[[], rx.Component]) -> rx.Component:
     return rx.hstack(
+        rx.toast.provider(),
         sidebar(),
         page(),
         width="100%",

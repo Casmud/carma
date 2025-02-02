@@ -9,6 +9,8 @@ from datetime import datetime
 
 import reflex_chakra as rc
 
+from ..components.dialog import CreateCompanyDialog
+
 
 class State(rx.State):
     fuel_records: list[Fuel] = []
@@ -48,17 +50,18 @@ class State(rx.State):
 
 
 def fuel_form():
+    create_company_dialog = CreateCompanyDialog.create()
     return rx.dialog.root(
         rx.dialog.trigger(rx.button("Add new fuel record")),
         rx.dialog.content(
             rx.dialog.title("Add new fuel record"),
+            create_company_dialog,
             rx.form(
                 rx.vstack(
                     rc.input(type_="date", name="date"),
                     rx.select.root(
                         rx.select.trigger(placeholder="Select gas station"),
                         rx.select.content(
-                            rx.select.group(
                                 rx.foreach(
                                     State.companies.items(),
                                     lambda item: rx.select.item(
@@ -66,9 +69,9 @@ def fuel_form():
                                         value=item[0],  # TOOD: Ask if this can neater
                                     ),
                                 )
-                            ),
                         ),
                         name="company",
+                        on_open_change=State.load_companies,
                     ),
                     rx.input(
                         placeholder="milage",

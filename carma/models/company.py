@@ -1,7 +1,7 @@
 from typing import TYPE_CHECKING
 
 from sqlalchemy import UniqueConstraint
-from sqlmodel import Field, Relationship
+from sqlmodel import Field, Relationship, select
 
 from .base import CarmaBase
 import reflex as rx
@@ -37,3 +37,13 @@ class Company(CarmaBase, table=True):
             )
             session.add(new_company)
             session.commit()
+
+    @staticmethod
+    def load_companies() -> list["Company"]:
+        """Get all companies from the database."""
+        with rx.session() as session:
+            companies = list(
+                session.exec(select(Company).order_by(Company.name)).all()
+            )
+
+            return companies
