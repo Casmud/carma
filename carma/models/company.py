@@ -4,6 +4,7 @@ from sqlalchemy import UniqueConstraint
 from sqlmodel import Field, Relationship
 
 from .base import CarmaBase
+import reflex as rx
 
 if TYPE_CHECKING:
     # See https://sqlmodel.tiangolo.com/tutorial/code-structure/
@@ -24,3 +25,15 @@ class Company(CarmaBase, table=True):
     # backend in rx.events and not in the frontend. So grab them in an event and
     # then store them in the State as regular attributes.
     fuels: list["Fuel"] = Relationship(back_populates="company")
+
+    @staticmethod
+    def add_company(name, address, is_gas_station, is_garage):
+        with rx.session() as session:
+            new_company = Company(
+                name=name,
+                address=address,
+                is_gas_station=is_gas_station,
+                is_garage=is_garage,
+            )
+            session.add(new_company)
+            session.commit()

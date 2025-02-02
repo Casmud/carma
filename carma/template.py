@@ -2,7 +2,7 @@ from typing import Callable
 
 import reflex as rx
 
-from .components.sidebar import sidebar
+from .components.template.sidebar import sidebar
 
 
 def template(page: Callable[[], rx.Component]) -> rx.Component:

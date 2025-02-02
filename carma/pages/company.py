@@ -3,22 +3,18 @@ from ..template import template
 from ..models.company import Company
 from sqlmodel import select
 
+from ..components.dialog import CreateCompanyDialog
+
 
 class State(rx.State):
     companies: list[Company] = []
 
     @rx.event
     def add_company(self, form_data: dict):
-        with rx.session() as session:
-            new_company = Company(
-                name=form_data["name"],
-                address=form_data["address"],
-                is_gas_station=form_data.get("is_fuel_station", False),
-                is_garage=form_data.get("is_garage", False),
-            )
-            session.add(new_company)
-            session.commit()
-            self.load_companies()
+        form_data["is_gas_station"] = form_data.get("is_gas_station", False)
+        form_data["is_garage"] = form_data.get("is_garage", False)
+        Company.add_company(**form_data)
+        self.load_companies()
 
     @rx.event
     def load_companies(self) -> None:
@@ -27,41 +23,6 @@ class State(rx.State):
             self.companies = list(
                 session.exec(select(Company).order_by(Company.name)).all()
             )
-
-
-def company_form():
-    return rx.dialog.root(
-        rx.dialog.trigger(rx.button("Add new company")),
-        rx.dialog.content(
-            rx.dialog.title("Add new company"),
-            rx.form(
-                rx.vstack(
-                    rx.input(
-                        placeholder="Name",
-                        name="name",
-                    ),
-                    rx.hstack(
-                        rx.text("Fuel Station: ", size="1"),
-                        rx.switch(name="is_fuel_station", default_checked=True),
-                    ),
-                    rx.hstack(
-                        rx.text("Garage:", size="1"),
-                        rx.switch(
-                            name="is_garage",
-                        ),
-                    ),
-                    rx.input(
-                        placeholder="Address",
-                        name="address",
-                    ),
-                    rx.dialog.close(rx.button("Add", type="submit")),
-                ),
-                on_submit=State.add_company,
-                reset_on_submit=False,
-            ),
-        ),
-    )
-
 
 def company_table():
     return rx.table.root(
@@ -77,7 +38,6 @@ def company_table():
         width="100%",
     )
 
-
 def show_company(company: Company):
     """Show a company in a table row."""
     return rx.table.row(
@@ -91,13 +51,15 @@ def show_company(company: Company):
         ),
     )
 
+create_company_dialog = CreateCompanyDialog.create
+
 
 @rx.page(route="/company", on_load=State.load_companies)
 @template
 def company_page() -> rx.Component:
     return rx.container(
         rx.vstack(
-            company_form(),
+            create_company_dialog(on_submit=State.add_company),
             rx.heading("Current companies:"),
             company_table(),
         )
