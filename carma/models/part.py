@@ -2,6 +2,8 @@ from sqlmodel import Field, Relationship
 from datetime import timedelta
 import reflex as rx
 
+from carma.models.base import CarmaBase
+
 
 class PartCategoryLink(rx.Model, table=True):
     part_id: int | None = Field(default=None, foreign_key="part.id", primary_key=True)
@@ -10,9 +12,7 @@ class PartCategoryLink(rx.Model, table=True):
     )
 
 
-class Part(rx.Model, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-
+class Part(CarmaBase, table=True):
     name: str
 
     milage_interval: int | None = None
@@ -23,9 +23,7 @@ class Part(rx.Model, table=True):
     )
 
 
-class Category(rx.Model, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-
+class Category(CarmaBase, table=True):
     name: str
 
     parts: list["Part"] | None = Relationship(

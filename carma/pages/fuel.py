@@ -1,30 +1,28 @@
+from typing import Dict
+
 import reflex as rx
 from ..template import template
 from ..models.fuel import Fuel
-from ..models.general import Company
+from ..models.company import Company
 from sqlmodel import select
 from datetime import datetime
+
+import reflex_chakra as rc
 
 
 class State(rx.State):
     fuel_records: list[Fuel] = []
-    companies: list[Company] = []
+    companies: Dict[str, Company] = {}
 
     @rx.event
     def add_fuel_record(self, form_data: dict):
         with rx.session() as session:
-            company = session.exec(
-                select(Company).where(Company.friendly_name == form_data["company"])
-            ).first()  # This is a bit janky, using the friendly name to find the company again...
-
             new_fuel_record = Fuel(
-                date=datetime.strptime(
-                    form_data["date"], "%d-%m-%Y"
-                ),  # need to find a date picker
+                date=datetime.strptime(form_data["date"], "%Y-%m-%d"),
                 milage=int(form_data["milage"]),
                 liters=float(form_data["liters"]),
                 price=float(form_data["price"]),
-                company=company,
+                company_id=float(form_data["company"]),
             )
             session.add(new_fuel_record)
             session.commit()
@@ -45,7 +43,8 @@ class State(rx.State):
     def load_companies(self) -> list[Company]:
         """Get all companies from the database."""
         with rx.session() as session:
-            self.companies = session.exec(select(Company)).all()
+            companies = session.exec(select(Company)).all()
+            self.companies = {str(company.id): company for company in companies}
 
 
 def fuel_form():
@@ -55,18 +54,16 @@ def fuel_form():
             rx.dialog.title("Add new fuel record"),
             rx.form(
                 rx.vstack(
-                    rx.input(
-                        placeholder="Date",
-                        name="date",
-                    ),
+                    rc.input(type_="date", name="date"),
                     rx.select.root(
                         rx.select.trigger(placeholder="Select gas station"),
                         rx.select.content(
                             rx.select.group(
                                 rx.foreach(
-                                    State.companies,
+                                    State.companies.items(),
                                     lambda item: rx.select.item(
-                                        item.friendly_name, value=item.friendly_name
+                                        item[1].name,
+                                        value=item[0],  # TOOD: Ask if this can neater
                                     ),
                                 )
                             ),
@@ -118,7 +115,9 @@ def show_fuel_item(item: Fuel):
         rx.table.cell(item.milage),
         rx.table.cell(item.liters),
         rx.table.cell(item.price),
-        rx.table.cell(item.company_id),  # item.company.friendly name is not working...
+        rx.table.cell(
+            item.company.name
+        ),  # item.company.friendly name is not working...
     )
 
 

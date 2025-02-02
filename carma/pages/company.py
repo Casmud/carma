@@ -1,6 +1,6 @@
 import reflex as rx
 from ..template import template
-from ..models.general import Company
+from ..models.company import Company
 from sqlmodel import select
 
 
@@ -11,19 +11,22 @@ class State(rx.State):
     def add_company(self, form_data: dict):
         with rx.session() as session:
             new_company = Company(
-                friendly_name=form_data["friendly_name"],
-                formal_name=form_data["formal_name"],
+                name=form_data["name"],
                 address=form_data["address"],
+                is_gas_station=form_data.get("is_fuel_station", False),
+                is_garage=form_data.get("is_garage", False),
             )
             session.add(new_company)
             session.commit()
             self.load_companies()
 
     @rx.event
-    def load_companies(self) -> list[Company]:
+    def load_companies(self) -> None:
         """Get all companies from the database."""
         with rx.session() as session:
-            self.companies = session.exec(select(Company)).all()
+            self.companies = list(
+                session.exec(select(Company).order_by(Company.name)).all()
+            )
 
 
 def company_form():
@@ -34,12 +37,18 @@ def company_form():
             rx.form(
                 rx.vstack(
                     rx.input(
-                        placeholder="Formal Name",
-                        name="formal_name",
+                        placeholder="Name",
+                        name="name",
                     ),
-                    rx.input(
-                        placeholder="Friendly name",
-                        name="friendly_name",
+                    rx.hstack(
+                        rx.text("Fuel Station: ", size="1"),
+                        rx.switch(name="is_fuel_station", default_checked=True),
+                    ),
+                    rx.hstack(
+                        rx.text("Garage:", size="1"),
+                        rx.switch(
+                            name="is_garage",
+                        ),
                     ),
                     rx.input(
                         placeholder="Address",
@@ -58,9 +67,9 @@ def company_table():
     return rx.table.root(
         rx.table.header(
             rx.table.row(
-                rx.table.column_header_cell("Friendly name"),
-                rx.table.column_header_cell("Formal name"),
+                rx.table.column_header_cell("Name"),
                 rx.table.column_header_cell("Address"),
+                rx.table.column_header_cell("Services"),
             ),
         ),
         rx.table.body(rx.foreach(State.companies, show_company)),
@@ -72,9 +81,14 @@ def company_table():
 def show_company(company: Company):
     """Show a company in a table row."""
     return rx.table.row(
-        rx.table.cell(company.friendly_name),
-        rx.table.cell(company.formal_name),
-        rx.table.cell(company.address),
+        rx.table.cell(company.name),
+        rx.table.cell(
+            "No known address" if company.address is None else company.address
+        ),
+        rx.table.cell(
+            rx.cond(company.is_gas_station, rx.badge("Gas Station")),
+            rx.cond(company.is_garage, rx.badge("Garage")),
+        ),
     )
 
 
@@ -82,5 +96,9 @@ def show_company(company: Company):
 @template
 def company_page() -> rx.Component:
     return rx.container(
-        rx.vstack(company_form(), rx.heading("Current companies:"), company_table())
+        rx.vstack(
+            company_form(),
+            rx.heading("Current companies:"),
+            company_table(),
+        )
     )

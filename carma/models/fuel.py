@@ -1,16 +1,21 @@
 from sqlmodel import Field, Relationship
 from datetime import datetime
-from carma.models.general import Company
-import reflex as rx
+
+from typing import TYPE_CHECKING
+from .base import CarmaBase
+from .company import Company
+
+# if TYPE_CHECKING: #chrashes if i do it like this
+#   from .company import Company
 
 
-class Fuel(rx.Model, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-
+class Fuel(CarmaBase, table=True):
     date: datetime
     milage: int
     liters: float
     price: float
 
     company_id: int | None = Field(default=None, foreign_key="company.id")
-    company: Company = Relationship()
+    company: "Company" = Relationship(
+        back_populates="fuels", sa_relationship_kwargs={"lazy": "selectin"}
+    )

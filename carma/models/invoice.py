@@ -1,13 +1,12 @@
 from sqlmodel import Field, Relationship
 from datetime import datetime
-from src.models.general import Company
-from src.models.part import Part
-import reflex as rx
+from .company import Company
+from .part import Part
+
+from .base import CarmaBase
 
 
-class Invoice(rx.Model, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-
+class Invoice(CarmaBase, table=True):
     date: datetime
 
     reference: int | None = None
@@ -24,9 +23,7 @@ class Invoice(rx.Model, table=True):
     )
 
 
-class InvoiceItem(rx.Model, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-
+class InvoiceItem(CarmaBase, table=True):
     amount: int
     vat_rate: float
     unit_price: float
@@ -45,9 +42,7 @@ class InvoiceItem(rx.Model, table=True):
         pass
 
 
-class PdfScan(rx.Model, table=True):
-    id: int | None = Field(default=None, primary_key=True)
-
+class PdfScan(CarmaBase, table=True):
     url: str
 
     invoice_id: int | None = Field(default=None, foreign_key="invoice.id")
