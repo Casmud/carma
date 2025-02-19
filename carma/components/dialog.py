@@ -5,7 +5,6 @@ import reflex as rx
 from ..models.company import Company
 
 class CreateCompanyDialog(rx.ComponentState):
-
     @rx.event
     def validate_and_add_company(self, form_data: dict):
         valid = True
@@ -24,8 +23,10 @@ class CreateCompanyDialog(rx.ComponentState):
             yield rx.toast.success("Successfully added company {}".format(form_data["name"]))
 
     @classmethod
-    def get_component(cls, **props):
-        return rx.dialog.content(
+    def get_component(cls, *children, **props):
+        return rx.dialog.root(
+            rx.dialog.trigger(*children),
+            rx.dialog.content(
                 rx.dialog.title("Add new company"),
                 rx.form(
                     rx.vstack(
@@ -53,3 +54,4 @@ class CreateCompanyDialog(rx.ComponentState):
                     on_submit=cls.validate_and_add_company,
                 )
             ,**props)
+        )

@@ -47,11 +47,8 @@ def company_page() -> rx.Component:
     create_company_dialog = CreateCompanyDialog.create
     return rx.container(
         rx.vstack(
-            rx.dialog.root(
-                rx.dialog.trigger(rx.button("Add new company in company page")),
-                create_company_dialog(on_close_auto_focus=State.load_companies),
+                create_company_dialog(rx.button("Add new company in company page!"), on_close_auto_focus=State.load_companies),
             ),
             rx.heading("Current companies:"),
             company_table(),
         )
-    )
