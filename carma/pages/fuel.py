@@ -55,7 +55,10 @@ def fuel_form():
         rx.dialog.trigger(rx.button("Add new fuel record")),
         rx.dialog.content(
             rx.dialog.title("Add new fuel record"),
-            create_company_dialog,
+            rx.dialog.root(
+                rx.dialog.trigger(rx.button("Add new company in fuel page")),
+                create_company_dialog
+            ),
             rx.form(
                 rx.vstack(
                     rc.input(type_="date", name="date"),

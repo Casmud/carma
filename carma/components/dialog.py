@@ -25,9 +25,7 @@ class CreateCompanyDialog(rx.ComponentState):
 
     @classmethod
     def get_component(cls, **props):
-        return rx.dialog.root(
-            rx.dialog.trigger(rx.button("Add new company")),
-            rx.dialog.content(
+        return rx.dialog.content(
                 rx.dialog.title("Add new company"),
                 rx.form(
                     rx.vstack(
@@ -55,5 +53,3 @@ class CreateCompanyDialog(rx.ComponentState):
                     on_submit=cls.validate_and_add_company,
                 )
             ,**props)
-        )
-
