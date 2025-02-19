@@ -6,6 +6,7 @@ readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
     "pandas>=2.2.3",
+    "plotly>=6.0.0",
     "reflex>=0.6.8",
     "reflex-chakra>=0.6.3",
     "sqlmodel>=0.0.22",
