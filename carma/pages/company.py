@@ -1,7 +1,6 @@
 import reflex as rx
 from ..template import template
 from ..models.company import Company
-from sqlmodel import select
 
 from ..components.dialog import CreateCompanyDialog
 

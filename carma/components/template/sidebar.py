@@ -33,6 +33,7 @@ def sidebar_items() -> rx.Component:
         sidebar_item("Facturen (mock)", "square-library", "/invoices"),
         sidebar_item("Companies", "building", "/company"),
         sidebar_item("Fuel", "fuel", "/fuel"),
+        sidebar_item("Mock data", "database", "/mock_data"),
         spacing="1",
         width="100%",
     )

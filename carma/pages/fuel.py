@@ -1,72 +1,62 @@
 from typing import Dict, Sequence
+from typing import TYPE_CHECKING
 
 import reflex as rx
 import pandas as pd
+
+from ..components.dialog import CreateFuelRecordDialog
 from ..template import template
 from ..models.fuel import Fuel
 from ..models.company import Company
-from sqlmodel import select
-from datetime import datetime
+from sqlmodel import select, desc
 
-import reflex_chakra as rc
 import plotly.express as px
 import plotly.graph_objects as go
 
-from ..components.dialog import CreateCompanyDialog
-
-def process_fuel_to_df(fuel_records: Sequence[Fuel]):
-    fuel_records_df = pd.DataFrame([vars(fuel_record) for fuel_record in fuel_records])
-
-    fuel_records_df = fuel_records_df[["date", "milage", "liters", "price"]]
-    fuel_records_df["date"] = pd.to_datetime(fuel_records_df["date"])
-
-    # Calculate km_driven
-    fuel_records_df["km_driven"] = fuel_records_df["milage"].diff()
-    fuel_records_df["km_driven"] = fuel_records_df["km_driven"].fillna(0)  # First entry has no previous mileage
-
-    # Calculate price_per_liter
-    fuel_records_df["price_per_liter"] = fuel_records_df["price"] / fuel_records_df[
-        "liters"]
-    fuel_records_df["price_per_liter"] = fuel_records_df["price_per_liter"].fillna(
-        0)
-
-    # Calculate consumption (km/L)
-    fuel_records_df["consumption"] = fuel_records_df["km_driven"] / fuel_records_df[
-        "liters"]
-    fuel_records_df["consumption"] = fuel_records_df["consumption"].replace([float('inf'), -float('inf')],
-                                                                            0).fillna(0)
-    return fuel_records_df
 
 class State(rx.State):
-    fuel_records: pd.DataFrame =  pd.DataFrame(columns=["date", "milage", "liters", "price", "km_driven", "price_per_liter", "consumption"])
+    fuel_records: pd.DataFrame =  pd.DataFrame(columns=["milage", "liters", "price", "km_driven", "price_per_liter", "consumption"])
     companies: Dict[str, Company] = {}
     time_range: str = "All time"
     fuel_figure: go.Figure = px.line()
     fuel_price_figure: go.Figure = px.line()
+    latest_fuel_record: Fuel = None
 
     @rx.var
     def average_consumption(self) -> float:
-        return self.fuel_records[self.fuel_records['consumption'] != 0]['consumption'].mean()
+        average = self.fuel_records[self.fuel_records['consumption'] != 0]['consumption'].mean()
+        return round(average, 2)
 
     @rx.var
     def average_fuel_price(self) -> float :
-        return self.fuel_records["price_per_liter"].mean()
+        average = self.fuel_records["price_per_liter"].mean()
+        return (round(average, 2))
 
     @rx.event
     def fuel_consumption_graph(self):
         self.fuel_figure = px.line(
             self.fuel_records[self.fuel_records['consumption'] != 0],
-            x="date",
+            x=self.fuel_records.index[self.fuel_records['consumption'] != 0],
             y="consumption",
+            line_shape="spline",
+            title = "Average consumption (KM/L)",
 
         )
+
+    @rx.event
+    def get_latest_fuel_record(self):
+        with rx.session() as session:
+            stmt = select(Fuel).order_by(desc(Fuel.date))
+            self.latest_fuel_record = session.exec(stmt).first()
 
     @rx.event
     def fuel_price_graph(self):
         self.fuel_price_figure = px.line(
             self.fuel_records,
-            x="date",
+            x=self.fuel_records.index,
             y="price_per_liter",
+            line_shape="spline",
+            title = "Liter fuel price (EU/L)",
 
         )
 
@@ -76,56 +66,20 @@ class State(rx.State):
         self.time_range = time_range
 
     @rx.event
-    def validate_and_add_fuel_record(self, form_data: dict):
-        valid = True
-        first_entry = len(self.fuel_records)==0
-        if form_data["milage"] =="":
-            yield rx.toast.error("Milage cannot be empty")
-            valid = False
-        elif int(form_data["milage"]) < 0:
-            yield rx.toast.error("Milage cannot be negative")
-            valid = False
-
-        if form_data["price"] =="":
-            yield rx.toast.error("Price cannot be empty")
-            valid = False
-        elif float(form_data["price"]) <= 0:
-            yield rx.toast.error("Price cannot be negative")
-            valid = False
-
-        if form_data["company"] =="":
-            yield rx.toast.error("Company cannot be empty")
-            valid = False
-
-        if not first_entry:
-            #TODO: add milage validation on neighbour entries (should not be lower or higher)
-            pass
-
-        if valid is True:
-            Fuel.add_fuel_record(**form_data)
-            self.load_fuel_records()
-            self.fuel_consumption_graph()
-            yield rx.toast.success("Fuel record added")
-
-    @rx.event
     def init_fuel_page(self):
         self.load_fuel_records()
-        self.load_companies()
+        self.fuel_consumption_graph()
+        self.fuel_price_graph()
+        self.get_latest_fuel_record()
 
     @rx.event
-    def load_fuel_records(self) -> pd.DataFrame:
+    def load_fuel_records(self):
         """Get all fuel items from the database."""
-        with rx.session() as session:
-            fuel_records = session.exec(select(Fuel)).all()
+        with rx.session() as session: # i tried moving this as a static method of Fuel, but it returns something different then?
+            results = session.exec(select(Fuel))
+            fuel_records = results.all()
+        self.fuel_records = Fuel.process_fuel_to_df(fuel_records)
 
-        self.fuel_records = process_fuel_to_df(fuel_records)
-
-    @rx.event
-    def load_companies(self) -> list[Company]:
-        """Get all companies from the database."""
-        with rx.session() as session:
-            companies = session.exec(select(Company)).all()
-            self.companies = {str(company.id): company for company in companies}
 
 def select_time_range():
     return rx.select(
@@ -134,53 +88,6 @@ def select_time_range():
             on_change=State.change_time_range,
         )
 
-
-    return None
-
-def fuel_form():
-    create_company_dialog = CreateCompanyDialog.create
-    return rx.dialog.root(
-        rx.dialog.trigger(rx.button("Add new fuel record")),
-        rx.dialog.content(
-            rx.dialog.title("Add new fuel record"),
-            create_company_dialog(rx.button("Add new company in fuel page!")),
-            rx.form(
-                rx.vstack(
-                    rc.input(type_="datetime-local", name="date", default_value=datetime.now().strftime('%Y-%m-%dT%H:%M')),
-                    rx.select.root(
-                        rx.select.trigger(placeholder="Select gas station"),
-                        rx.select.content(
-                                rx.foreach(
-                                    State.companies.items(),
-                                    lambda item: rx.select.item(
-                                        item[1].name,
-                                        value=item[0],  # TOOD: Ask if this can neater
-                                    ),
-                                )
-                        ),
-                        name="company",
-                        on_open_change=State.load_companies,
-                    ),
-                    rx.input(
-                        placeholder="milage",
-                        name="milage",
-                    ),
-                    rx.input(
-                        placeholder="liters",
-                        name="liters",
-                    ),
-                    rx.input(
-                        placeholder="price",
-                        name="price",
-                    ),
-                    rx.dialog.close(rx.button("Add record", type="submit")),
-                ),
-                on_submit=State.validate_and_add_fuel_record,
-                reset_on_submit=False,
-            ),
-        ),
-    )
-
 def fuel_table():
     return rx.data_table(
         data = State.fuel_records,
@@ -188,24 +95,107 @@ def fuel_table():
         pagination= True
     )
 
+def general_stat_card(
+        description,
+        unit,
+        value,
+        icon,
+        color
+) -> rx.Component:
+    return rx.box(rx.card(
+        rx.vstack(
+            rx.hstack(
+                rx.badge(
+                    rx.icon(tag=icon, size=34),
+                    radius="full",
+                    color=color,
+                    padding="0.7rem",
+                ),
+                rx.vstack(
+                    rx.heading(
+                    f"{value:.2f} {unit}",
+                        size="6",
+                        weight="bold",
+                    ),
+                    rx.text(
+                        description, size="4", weight="medium"
+                    ),
+                    spacing="1",
+                    height="100%",
+                    align_items="start",
+                    width="100%",
+                ),
+                height="100%",
+                spacing="4",
+                align="center",
+                width="100%",
+            ),
+            spacing="3",
+        ),
+        size="3",
+        width="400px",
+    ))
+
+def average_fuel_price_card():
+    pass
+
+def latest_fuel_visit_card():
+    return rx.card(
+        rx.heading("Last fuel record"),
+
+    rx.data_list.root(
+        rx.data_list.item(
+            rx.data_list.label("Date"),
+            rx.data_list.value(rx.moment(State.latest_fuel_record.date))
+            ),
+        rx.data_list.item(
+            rx.data_list.label("Location"),
+            rx.data_list.value(State.latest_fuel_record.company.name)
+        ),
+        rx.data_list.item(
+            rx.data_list.label("Amount"),
+            rx.data_list.value(State.latest_fuel_record.liters)
+        ),
+        rx.data_list.item(
+            rx.data_list.label("Price"),
+            rx.data_list.value(State.latest_fuel_record.price)
+        ),
+        rx.data_list.item(
+            rx.data_list.label("Milage"),
+            rx.data_list.value(State.latest_fuel_record.milage)
+        ),
+            align="center",
+        )
+    )
+
 @rx.page(route="/fuel", on_load=State.init_fuel_page)
 @template
 def fuel_page() -> rx.Component:
-    return rx.vstack(
-            select_time_range(),
-        rx.badge("Time range is not yet implemented, statistics based on all time data", color_scheme="red"),
-            fuel_form(),
-        rx.text(f"Average fuel consumption: {State.average_consumption} km/L"),
-        rx.text(f"Average fuel cost: {State.average_fuel_price} eur/L"),
-        rx.heading("Consumption over time"),
+    create_fuel_record_dialog = CreateFuelRecordDialog.create
+    fuel_consumption_card = general_stat_card(description="Average Fuel Consumption",value=State.average_consumption,icon="gauge", unit="KM/L", color="cyan")
+    fuel_price_card = general_stat_card(description="Average Fuel Price", value=State.average_fuel_price, icon="euro", unit="EU/L", color="orange")
+    return rx.container(rx.vstack(
+
+        rx.heading('Quick Statistics'),
+        rx.hstack(select_time_range(),rx.badge("Time range is not yet implemented, statistics based on all time data", color_scheme="red")),
+        rx.hstack(
+        rx.vstack(
+        fuel_consumption_card,
+        fuel_price_card
+        ),
+        latest_fuel_visit_card()
+        ),
+        create_fuel_record_dialog(rx.button("Add new fuel record in fuel page!"), on_close_auto_focus=State.init_fuel_page),
+        rx.heading('Historical graphs'),
+        rx.hstack(
         rx.plotly(
             data=State.fuel_figure,
             on_mount=State.fuel_consumption_graph,
         ),
-        rx.heading("Fuel price over time"),
         rx.plotly(
             data=State.fuel_price_figure,
             on_mount=State.fuel_price_graph,
+        )
         ),
             rx.heading("Historical fuel records:"),
-        fuel_table())
+        fuel_table()), size="4")
