@@ -42,8 +42,6 @@ class Company(CarmaBase, table=True):
     def load_companies() -> list["Company"]:
         """Get all companies from the database."""
         with rx.session() as session:
-            companies = list(
-                session.exec(select(Company).order_by(Company.name)).all()
-            )
+            companies = list(session.exec(select(Company).order_by(Company.name)).all())
 
             return companies

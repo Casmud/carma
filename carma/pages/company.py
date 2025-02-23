@@ -13,6 +13,7 @@ class State(rx.State):
         """Get all companies from the database."""
         self.companies = Company.load_companies()
 
+
 def company_table():
     return rx.table.root(
         rx.table.header(
@@ -27,6 +28,7 @@ def company_table():
         width="100%",
     )
 
+
 def show_company(company: Company):
     """Show a company in a table row."""
     return rx.table.row(
@@ -40,14 +42,18 @@ def show_company(company: Company):
         ),
     )
 
+
 @rx.page(route="/company", on_load=State.load_companies)
 @template
 def company_page() -> rx.Component:
     create_company_dialog = CreateCompanyDialog.create
     return rx.container(
         rx.vstack(
-                create_company_dialog(rx.button("Add new company in company page!"), on_close_auto_focus=State.load_companies),
+            create_company_dialog(
+                rx.button("Add new company in company page!"),
+                on_close_auto_focus=State.load_companies,
             ),
-            rx.heading("Current companies:"),
-            company_table(),
-        )
+        ),
+        rx.heading("Current companies:"),
+        company_table(),
+    )

@@ -1,5 +1,3 @@
-import logging
-
 import reflex as rx
 import reflex_chakra as rc
 
@@ -9,45 +7,48 @@ from typing import Dict
 
 from datetime import datetime
 
-import reflex_chakra as rc
 
 from sqlmodel import select
-import pandas as pd
+
 
 def dialog_header(title, sub_title, icon, color_scheme):
-    return rx.box(rx.hstack(
-                rx.badge(
-                    rx.icon(tag=icon, size=32),
-                    color_scheme=color_scheme,
-                    radius="full",
-                    padding="0.65rem",
+    return rx.box(
+        rx.hstack(
+            rx.badge(
+                rx.icon(tag=icon, size=32),
+                color_scheme=color_scheme,
+                radius="full",
+                padding="0.65rem",
+            ),
+            rx.vstack(
+                rx.heading(
+                    title,
+                    size="4",
+                    weight="bold",
                 ),
-                rx.vstack(
-                    rx.heading(
-                        title,
-                        size="4",
-                        weight="bold",
-                    ),
-                    rx.text(
-                        sub_title,
-                        size="2",
-                    ),
-                    spacing="1",
-                    height="100%",
-                    align_items="start",
+                rx.text(
+                    sub_title,
+                    size="2",
                 ),
+                spacing="1",
                 height="100%",
-                spacing="4",
-                align_items="center",
-                width="100%",
-            ))
+                align_items="start",
+            ),
+            height="100%",
+            spacing="4",
+            align_items="center",
+            width="100%",
+        )
+    )
 
 
 class CreateCompanyDialog(rx.ComponentState):
     @rx.event
     def validate_and_add_company(self, form_data: dict):
         valid = True
-        existing_name = any(company.name == form_data["name"] for company in Company.load_companies())
+        existing_name = any(
+            company.name == form_data["name"] for company in Company.load_companies()
+        )
         if existing_name:
             valid = False
             yield rx.toast.error("Name already exists!")
@@ -59,50 +60,71 @@ class CreateCompanyDialog(rx.ComponentState):
             yield rx.toast.error("At least one option should be selected!")
         if valid is True:
             Company.add_company(**form_data)
-            yield rx.toast.success("Successfully added company {}".format(form_data["name"]))
+            yield rx.toast.success(
+                "Successfully added company {}".format(form_data["name"])
+            )
 
     @classmethod
     def get_component(cls, *children, **props):
         return rx.dialog.root(
             rx.dialog.trigger(*children),
-                rx.dialog.content(
-                    rx.flex(
+            rx.dialog.content(
+                rx.flex(
                     rx.vstack(
-                        dialog_header(title="Add new company", sub_title="Companies can be used for registering maintenance (garage) and/or fuel records (gas station)", icon="building-2", color_scheme="mint"),
+                        dialog_header(
+                            title="Add new company",
+                            sub_title="Companies can be used for registering maintenance (garage) and/or fuel records (gas station)",
+                            icon="building-2",
+                            color_scheme="mint",
+                        ),
                         rx.form(
                             rx.flex(
                                 rx.vstack(
                                     rx.text("Company Name"),
-                                            rx.input(
-                                                placeholder="Name",
-                                                name="name",
-                                                width="400px"
-                                            )
+                                    rx.input(
+                                        placeholder="Name", name="name", width="400px"
                                     ),
+                                ),
                                 rx.vstack(
                                     rx.text("Type of facility"),
                                     rx.hstack(
-                                        rx.checkbox(id="is_gas_station", default_checked=True, text="Gas Station",),
-                                        rx.checkbox(id="is_garage",text="Garage",),
-                                    )
+                                        rx.checkbox(
+                                            id="is_gas_station",
+                                            default_checked=True,
+                                            text="Gas Station",
+                                        ),
+                                        rx.checkbox(
+                                            id="is_garage",
+                                            text="Garage",
+                                        ),
+                                    ),
                                 ),
                                 rx.vstack(
                                     rx.text("Address details"),
                                     rx.input(
                                         placeholder="Address",
                                         name="address",
-                                        width="400px"
+                                        width="400px",
+                                    ),
+                                ),
+                                rx.dialog.close(
+                                    rx.button(
+                                        "Add company", type="submit", width="400px"
                                     )
                                 ),
-                                rx.dialog.close(rx.button("Add company", type="submit", width="400px"))
-                                ,direction = "column", align = "center", spacing = "2"),
-                        reset_on_submit = False,
-                        on_submit = cls.validate_and_add_company,
-                        )
+                                direction="column",
+                                align="center",
+                                spacing="2",
+                            ),
+                            reset_on_submit=False,
+                            on_submit=cls.validate_and_add_company,
+                        ),
                     )
-                )
-            ,**props)
+                ),
+                **props,
+            ),
         )
+
 
 class CreateFuelRecordDialog(rx.ComponentState):
     companies: Dict[str, Company] = {}
@@ -117,7 +139,7 @@ class CreateFuelRecordDialog(rx.ComponentState):
     @rx.event
     def validate_and_add_fuel_record(self, form_data: dict):
         if "liters" not in form_data:
-            #check for nested dialog forms, if event is triggered for actually validation of fuel data
+            # check for nested dialog forms, if event is triggered for actually validation of fuel data
             pass
         else:
             valid = True
@@ -145,10 +167,12 @@ class CreateFuelRecordDialog(rx.ComponentState):
                 valid = False
 
             # Check if the exact date already exist
-            new_date = datetime.strptime(form_data["date"], '%Y-%m-%dT%H:%M')
+            new_date = datetime.strptime(form_data["date"], "%Y-%m-%dT%H:%M")
 
             if new_date in df_fuel_records.index:
-                yield rx.toast.error("Already a record in database for this exact moment.")
+                yield rx.toast.error(
+                    "Already a record in database for this exact moment."
+                )
                 valid = False
 
             # Check if previous (date) record is lower
@@ -156,7 +180,9 @@ class CreateFuelRecordDialog(rx.ComponentState):
             if not previous_dates.empty:
                 previous_milage = df_fuel_records.loc[previous_dates[-1], "milage"]
                 if int(form_data["milage"]) < previous_milage:
-                    yield rx.toast.error("Milage must be greater than the previous recorded milage.")
+                    yield rx.toast.error(
+                        "Milage must be greater than the previous recorded milage."
+                    )
                     valid = False
 
             # Check if next (date) record is higher
@@ -164,76 +190,106 @@ class CreateFuelRecordDialog(rx.ComponentState):
             if not next_dates.empty:
                 next_milage = df_fuel_records.loc[next_dates[0], "milage"]
                 if int(form_data["milage"]) > next_milage:
-                    yield rx.toast.error("Milage must be less than the next recorded milage.")
+                    yield rx.toast.error(
+                        "Milage must be less than the next recorded milage."
+                    )
                     valid = False
 
             if valid is True:
-                Fuel.add_fuel_record(date=form_data["date"],milage=form_data["milage"],liters=form_data["liters"],price=form_data["price"],company=form_data["company"])
+                Fuel.add_fuel_record(
+                    date=form_data["date"],
+                    milage=form_data["milage"],
+                    liters=form_data["liters"],
+                    price=form_data["price"],
+                    company=form_data["company"],
+                )
                 yield rx.toast.success("Fuel record added")
 
     @classmethod
     def get_component(cls, *children, **props):
         create_company_dialog = CreateCompanyDialog.create
 
-
         return rx.dialog.root(
             rx.dialog.trigger(*children),
-                rx.dialog.content(
-                    rx.flex(
+            rx.dialog.content(
+                rx.flex(
                     rx.vstack(
-                        dialog_header(title="Add new fuel record", sub_title="Fill details on fuel station visit below", icon="fuel", color_scheme="orange"),
-                        rx.form(
-                rx.vstack(
-                    rx.vstack(
-                        rx.text('Time of visit'),
-                    rc.input(type_="datetime-local", name="date", default_value=datetime.now().strftime('%Y-%m-%dT%H:%M'))
-                    ),
-
-                    rx.vstack(
-                        rx.text("Location"),
-
-                    rx.hstack(
-                    rx.select.root(
-                        rx.select.trigger(placeholder="Select gas station"),
-                        rx.select.content(
-                                rx.foreach(
-                                    cls.companies.items(),
-                                    lambda item: rx.select.item(
-                                        item[1].name,
-                                        value=item[0],  # TOOD: Ask if this can neater
-                                    ),
-                                )
+                        dialog_header(
+                            title="Add new fuel record",
+                            sub_title="Fill details on fuel station visit below",
+                            icon="fuel",
+                            color_scheme="orange",
                         ),
-                        name="company",
-                        on_open_change=cls.load_companies,
-                    ),
-                    create_company_dialog(rx.button("New Gas Station")),
-                    )
-                    ),
-                    rx.vstack(
-                        rx.text("Milage"),
-                    rc.number_input(
-                        name="milage",
-                    )
-                    ),
-                    rx.vstack(
-                        rx.text("Liters"),
-                    rx.input(
-                        name="liters",
-                    )
-                    ),
-                    rx.vstack(
-                        rx.text("Price"),
-                    rx.input(
-                        name="price",
-                    )
-                    ),
-                    rx.dialog.close(rx.button("Add fuel record", type="submit", width="400px"))
-                    , direction="column", align="center", spacing="2"),
+                        rx.form(
+                            rx.vstack(
+                                rx.vstack(
+                                    rx.text("Time of visit"),
+                                    rc.input(
+                                        type_="datetime-local",
+                                        name="date",
+                                        default_value=datetime.now().strftime(
+                                            "%Y-%m-%dT%H:%M"
+                                        ),
+                                    ),
+                                ),
+                                rx.vstack(
+                                    rx.text("Location"),
+                                    rx.hstack(
+                                        rx.select.root(
+                                            rx.select.trigger(
+                                                placeholder="Select gas station"
+                                            ),
+                                            rx.select.content(
+                                                rx.foreach(
+                                                    cls.companies.items(),
+                                                    lambda item: rx.select.item(
+                                                        item[1].name,
+                                                        value=item[
+                                                            0
+                                                        ],  # TOOD: Ask if this can neater
+                                                    ),
+                                                )
+                                            ),
+                                            name="company",
+                                            on_open_change=cls.load_companies,
+                                        ),
+                                        create_company_dialog(
+                                            rx.button("New Gas Station")
+                                        ),
+                                    ),
+                                ),
+                                rx.vstack(
+                                    rx.text("Milage"),
+                                    rc.number_input(
+                                        name="milage",
+                                    ),
+                                ),
+                                rx.vstack(
+                                    rx.text("Liters"),
+                                    rx.input(
+                                        name="liters",
+                                    ),
+                                ),
+                                rx.vstack(
+                                    rx.text("Price"),
+                                    rx.input(
+                                        name="price",
+                                    ),
+                                ),
+                                rx.dialog.close(
+                                    rx.button(
+                                        "Add fuel record", type="submit", width="400px"
+                                    )
+                                ),
+                                direction="column",
+                                align="center",
+                                spacing="2",
+                            ),
                             reset_on_submit=False,
                             on_submit=cls.validate_and_add_fuel_record,
-                        )
+                        ),
                     )
-                    )
-                    , **props)
+                ),
+                **props,
+            ),
         )
