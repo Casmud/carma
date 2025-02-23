@@ -272,7 +272,7 @@ class CreateFuelRecordDialog(rx.ComponentState):
                                                     lambda item: rx.select.item(
                                                         item[1].name,
                                                         value=item[0],
-                                                    ),
+                                                    ), #TODO: I already spend too much time on this, is there not a neater way to do this?
                                                 )
                                             ),
                                             name="company",

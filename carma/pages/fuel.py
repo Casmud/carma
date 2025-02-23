@@ -90,7 +90,8 @@ class State(rx.State):
             results = session.exec(select(Fuel))
             fuel_records = results.all()
 
-        # TODO: i have this loading as a static method, but then it doesnt seem to work?
+        # TODO: I tried moving *EXACT* same function as a static method to Fuel (repo model?) but then it seems to
+        #  change the output?! -see line below
         # fuel_records = Fuel.load_all_fuel_records()
 
         self.fuel_records = Fuel.process_fuel_to_df(fuel_records)
