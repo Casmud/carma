@@ -1,4 +1,5 @@
 import reflex as rx
+
 from ..template import template
 
 
@@ -11,9 +12,7 @@ def invoice_page() -> rx.Component:
             rx.hstack(
                 rx.card(
                     rx.data_list.root(
-                        rx.data_list.item(
-                            rx.data_list.value(rx.text.strong("Lexus Den Haag"))
-                        ),
+                        rx.data_list.item(rx.data_list.value(rx.text.strong("Lexus Den Haag"))),
                         rx.data_list.item(
                             rx.data_list.label("Datum"),
                             rx.data_list.value("10-07-2021"),

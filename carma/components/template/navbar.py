@@ -1,5 +1,5 @@
 import reflex as rx
-from reflex.style import set_color_mode, color_mode
+from reflex.style import color_mode, set_color_mode
 
 
 def navbar_link(text: str, url: str) -> rx.Component:

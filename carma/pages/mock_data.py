@@ -1,16 +1,19 @@
-import reflex as rx
-from ..template import template
-from carma.models.company import Company
-from carma.models.fuel import Fuel
 import csv
 from datetime import datetime
+
+import reflex as rx
+
+from carma.models.company import Company
+from carma.models.fuel import Fuel
+
+from ..template import template
 
 
 class State(rx.State):
     @rx.event
     def add_company_data(self) -> None:
         # Read the CSV file and add records to the database
-        with open("assets/mock_company_data.csv", "r") as file:
+        with open("assets/mock_company_data.csv") as file:
             reader = csv.DictReader(file)
             for row in reader:
                 name = str(row["name"])
@@ -28,7 +31,7 @@ class State(rx.State):
     @rx.event
     def add_fuel_data(self) -> None:
         # Read the CSV file and add records to the database
-        with open("assets/mock_fuel_data.csv", "r") as file:
+        with open("assets/mock_fuel_data.csv") as file:
             reader = csv.DictReader(file)
             for row in reader:
                 date = datetime.strptime(row["date"], "%m/%d/%Y")

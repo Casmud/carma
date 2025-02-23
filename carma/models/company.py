@@ -1,10 +1,10 @@
 from typing import TYPE_CHECKING
 
+import reflex as rx
 from sqlalchemy import UniqueConstraint
 from sqlmodel import Field, Relationship, select
 
 from .base import CarmaBase
-import reflex as rx
 
 if TYPE_CHECKING:
     # See https://sqlmodel.tiangolo.com/tutorial/code-structure/
@@ -14,9 +14,7 @@ if TYPE_CHECKING:
 class Company(CarmaBase, table=True):
     __table_args__ = (UniqueConstraint("name", name="uix_company_name"),)
 
-    name: str = Field(
-        nullable=False
-    )  # Alternate key -> needs UniqueConstraint and may not be null.
+    name: str = Field(nullable=False)  # Alternate key -> needs UniqueConstraint and may not be null.
     address: str | None
     is_gas_station: bool = Field(default=True)
     is_garage: bool = Field(default=False)

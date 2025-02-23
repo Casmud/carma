@@ -1,6 +1,7 @@
 import reflex as rx
-from ..template import template
+
 from ..components.dialog import CreateFuelRecordDialog
+from ..template import template
 
 
 @rx.page(route="/")

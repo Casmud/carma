@@ -1,8 +1,8 @@
 import reflex as rx
-from ..template import template
-from ..models.company import Company
 
 from ..components.dialog import CreateCompanyDialog
+from ..models.company import Company
+from ..template import template
 
 
 class State(rx.State):
@@ -33,9 +33,7 @@ def show_company(company: Company):
     """Show a company in a table row."""
     return rx.table.row(
         rx.table.cell(company.name),
-        rx.table.cell(
-            "No known address" if company.address is None else company.address
-        ),
+        rx.table.cell("No known address" if company.address is None else company.address),
         rx.table.cell(
             rx.cond(company.is_gas_station, rx.badge("Gas Station")),
             rx.cond(company.is_garage, rx.badge("Garage")),

@@ -1,9 +1,10 @@
-from sqlmodel import Field, Relationship
 from datetime import datetime
-from .company import Company
-from .part import Part
+
+from sqlmodel import Field, Relationship
 
 from .base import CarmaBase
+from .company import Company
+from .part import Part
 
 
 class Invoice(CarmaBase, table=True):
@@ -15,12 +16,8 @@ class Invoice(CarmaBase, table=True):
     company_id: int | None = Field(default=None, foreign_key="company.id")
     company: Company = Relationship()
 
-    items: list["InvoiceItem"] = Relationship(
-        back_populates="invoice", cascade_delete=True
-    )
-    scans: list["PdfScan"] | None = Relationship(
-        back_populates="invoice", cascade_delete=True
-    )
+    items: list["InvoiceItem"] = Relationship(back_populates="invoice", cascade_delete=True)
+    scans: list["PdfScan"] | None = Relationship(back_populates="invoice", cascade_delete=True)
 
 
 class InvoiceItem(CarmaBase, table=True):
@@ -30,9 +27,7 @@ class InvoiceItem(CarmaBase, table=True):
 
     description: str | None = None
 
-    invoice_id: int | None = Field(
-        default=None, foreign_key="invoice.id", ondelete="CASCADE"
-    )
+    invoice_id: int | None = Field(default=None, foreign_key="invoice.id", ondelete="CASCADE")
     invoice: Invoice = Relationship(back_populates="items")
 
     part_id: int | None = Field(default=None, foreign_key="part.id")

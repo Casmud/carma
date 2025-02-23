@@ -1,30 +1,29 @@
-from typing import Dict
-
-import reflex as rx
 import pandas as pd
-
-from ..components.dialog import CreateFuelRecordDialog
-from ..template import template
-from ..models.fuel import Fuel
-from ..models.company import Company
-from sqlmodel import select, desc
-
 import plotly.express as px
 import plotly.graph_objects as go
+import reflex as rx
+from sqlmodel import desc, select
+
+from ..components.dialog import CreateFuelRecordDialog
+from ..models.company import Company
+from ..models.fuel import Fuel
+from ..template import template
 
 
 class State(rx.State):
     fuel_records: pd.DataFrame = pd.DataFrame(
         columns=[
-            "milage",
-            "liters",
-            "price",
-            "km_driven",
-            "price_per_liter",
-            "consumption",
+            "Date",
+            "Company",
+            "Mileage",
+            "Liters",
+            "Price",
+            "KM Driven",
+            "Price per Liter",
+            "Consumption",
         ]
     )
-    companies: Dict[str, Company] = {}
+    companies: dict[str, Company] = {}
     time_range: str = "All time"
     fuel_figure: go.Figure = px.line()
     fuel_price_figure: go.Figure = px.line()
@@ -32,49 +31,53 @@ class State(rx.State):
 
     @rx.var
     def average_consumption(self) -> float:
-        average = self.fuel_records[self.fuel_records["consumption"] != 0][
-            "consumption"
-        ].mean()
+        """Calculates average fuel consumption over all data, returns rounded off value (2 decimals)"""
+        average = self.fuel_records[self.fuel_records["Consumption"] != 0]["Consumption"].mean()
         return round(average, 2)
 
     @rx.var
     def average_fuel_price(self) -> float:
-        average = self.fuel_records["price_per_liter"].mean()
+        """Calculates average fuel price over all data, returns rounded off value (2 decimals)"""
+        average = self.fuel_records["Price per Liter"].mean()
         return round(average, 2)
 
     @rx.event
     def fuel_consumption_graph(self):
+        """Generates graph of fuel consumption over time"""
         self.fuel_figure = px.line(
-            self.fuel_records[self.fuel_records["consumption"] != 0],
-            x=self.fuel_records.index[self.fuel_records["consumption"] != 0],
-            y="consumption",
+            self.fuel_records[self.fuel_records["Consumption"] != 0],
+            x=self.fuel_records.index[self.fuel_records["Consumption"] != 0],
+            y="Consumption",
             line_shape="spline",
             title="Average consumption (KM/L)",
         )
 
     @rx.event
     def get_latest_fuel_record(self):
+        """Get most recent fuel record from database"""
         with rx.session() as session:
             stmt = select(Fuel).order_by(desc(Fuel.date))
             self.latest_fuel_record = session.exec(stmt).first()
 
     @rx.event
     def fuel_price_graph(self):
+        """Generates graph of fuel price over time"""
         self.fuel_price_figure = px.line(
             self.fuel_records,
             x=self.fuel_records.index,
-            y="price_per_liter",
+            y="Price per Liter",
             line_shape="spline",
             title="Liter fuel price (EU/L)",
         )
 
     @rx.event
     def change_time_range(self, time_range: str):
-        """Change the select value var."""
+        """Select time range of statistics (not in use yet)"""
         self.time_range = time_range
 
     @rx.event
     def init_fuel_page(self):
+        """Used to initialize the fuel page and variables. Also used for 'reloading' after data has been updated."""
         self.load_fuel_records()
         self.fuel_consumption_graph()
         self.fuel_price_graph()
@@ -82,16 +85,19 @@ class State(rx.State):
 
     @rx.event
     def load_fuel_records(self):
-        """Get all fuel items from the database."""
-        with (
-            rx.session() as session
-        ):  # i tried moving this as a static method of Fuel, but it returns something different then?
+        """Get all data from the database"""
+        with rx.session() as session:
             results = session.exec(select(Fuel))
             fuel_records = results.all()
+
+        # TODO: i have this loading as a static method, but then it doesnt seem to work?
+        # fuel_records = Fuel.load_all_fuel_records()
+
         self.fuel_records = Fuel.process_fuel_to_df(fuel_records)
 
 
 def select_time_range():
+    """Selection drop down for selecting time period for statistics (not used yet)"""
     return rx.select(
         ["All time", "Last month", "Last year"],
         value=State.time_range,
@@ -99,11 +105,23 @@ def select_time_range():
     )
 
 
-def fuel_table():
+def fuel_table() -> rx.Component:
+    """Fuel table of all historical fuel records"""
     return rx.data_table(data=State.fuel_records, sort=True, pagination=True)
 
 
 def general_stat_card(description, unit, value, icon, color) -> rx.Component:
+    """General card to show statistics in fuel page
+
+    Parameters
+    ----------
+    description: description of the statistic
+    unit: unit of the statistic
+    value: value of the statistic
+    icon: icon of the statics
+    color: color of the icon
+
+    """
     return rx.box(
         rx.card(
             rx.vstack(
@@ -139,11 +157,8 @@ def general_stat_card(description, unit, value, icon, color) -> rx.Component:
     )
 
 
-def average_fuel_price_card():
-    pass
-
-
-def latest_fuel_visit_card():
+def latest_fuel_visit_card() -> rx.Component:
+    """Card with an overview of the latest (most recent) fuel record"""
     return rx.card(
         rx.heading("Last fuel record"),
         rx.data_list.root(

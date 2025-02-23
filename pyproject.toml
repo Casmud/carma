@@ -11,3 +11,21 @@ dependencies = [
     "reflex-chakra>=0.6.3",
     "sqlmodel>=0.0.22",
 ]
+
+[tool.ruff]
+lint.select = [
+    # pycodestyle
+    "E",
+    # Pyflakes
+    "F",
+    # pyupgrade
+    "UP",
+    # flake8-bugbear
+    "B",
+    # flake8-simplify
+    "SIM",
+    # isort
+    "I",
+]
+format.docstring-code-format = true
+line-length = 120
