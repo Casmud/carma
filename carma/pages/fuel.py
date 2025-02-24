@@ -29,6 +29,7 @@ class State(rx.State):
     fuel_price_figure: go.Figure = px.line()
     latest_fuel_record: Fuel = None
 
+# COMPUTED VARS
     @rx.var
     def average_consumption(self) -> float:
         """Calculates average fuel consumption over all data, returns rounded off value (2 decimals)"""
@@ -41,6 +42,9 @@ class State(rx.State):
         average = self.fuel_records["Price per Liter"].mean()
         return round(average, 2)
 
+##EVENTS
+
+#GRAPHS
     @rx.event
     def fuel_consumption_graph(self):
         """Generates graph of fuel consumption over time"""
@@ -53,13 +57,6 @@ class State(rx.State):
         )
 
     @rx.event
-    def get_latest_fuel_record(self):
-        """Get most recent fuel record from database"""
-        with rx.session() as session:
-            stmt = select(Fuel).order_by(desc(Fuel.date))
-            self.latest_fuel_record = session.exec(stmt).first()
-
-    @rx.event
     def fuel_price_graph(self):
         """Generates graph of fuel price over time"""
         self.fuel_price_figure = px.line(
@@ -70,18 +67,14 @@ class State(rx.State):
             title="Liter fuel price (EU/L)",
         )
 
-    @rx.event
-    def change_time_range(self, time_range: str):
-        """Select time range of statistics (not in use yet)"""
-        self.time_range = time_range
 
+# DB REQUESTS
     @rx.event
-    def init_fuel_page(self):
-        """Used to initialize the fuel page and variables. Also used for 'reloading' after data has been updated."""
-        self.load_fuel_records()
-        self.fuel_consumption_graph()
-        self.fuel_price_graph()
-        self.get_latest_fuel_record()
+    def get_latest_fuel_record(self):
+        """Get most recent fuel record from database"""
+        with rx.session() as session:
+            stmt = select(Fuel).order_by(desc(Fuel.date))
+            self.latest_fuel_record = session.exec(stmt).first()
 
     @rx.event
     def load_fuel_records(self):
@@ -96,21 +89,24 @@ class State(rx.State):
 
         self.fuel_records = Fuel.process_fuel_to_df(fuel_records)
 
+# CALLBACKS
+    @rx.event
+    def change_time_range(self, time_range: str):
+        """Select time range of statistics (not in use yet)"""
+        self.time_range = time_range
 
-def select_time_range():
-    """Selection drop down for selecting time period for statistics (not used yet)"""
-    return rx.select(
-        ["All time", "Last month", "Last year"],
-        value=State.time_range,
-        on_change=State.change_time_range,
-    )
+# PAGE INITIALIZE
+    @rx.event
+    def init_fuel_page(self):
+        """Used to initialize the fuel page and variables. Also used for 'reloading' after data has been updated."""
+        self.load_fuel_records()
+        self.fuel_consumption_graph()
+        self.fuel_price_graph()
+        self.get_latest_fuel_record()
 
+## UI ELEMENTS
 
-def fuel_table() -> rx.Component:
-    """Fuel table of all historical fuel records"""
-    return rx.data_table(data=State.fuel_records, sort=True, pagination=True)
-
-
+# GENERAL ELEMENTS
 def general_stat_card(description, unit, value, icon, color) -> rx.Component:
     """General card to show statistics in fuel page
 
@@ -156,6 +152,22 @@ def general_stat_card(description, unit, value, icon, color) -> rx.Component:
             width="400px",
         )
     )
+
+
+# SPECIFIC ELEMENTS
+
+def select_time_range():
+    """Selection drop down for selecting time period for statistics (not used yet)"""
+    return rx.select(
+        ["All time", "Last month", "Last year"],
+        value=State.time_range,
+        on_change=State.change_time_range,
+    )
+
+
+def fuel_table() -> rx.Component:
+    """Fuel table of all historical fuel records"""
+    return rx.data_table(data=State.fuel_records, sort=True, pagination=True)
 
 
 def latest_fuel_visit_card() -> rx.Component:
