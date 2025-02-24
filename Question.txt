@@ -1,0 +1,13 @@
+Q: https://reflex.dev/docs/vars/base-vars/#backend-only-vars
+Q: Nice way to loop through data
+Q: TYPE_CHECKING error
+Q: does the way i make things general make sense?
+	dialog/components
+	static methods
+	how to refresh?
+	form in form? (nested forms) --> Issue?
+Q: Generators (YIELD)
+
+Q: i tried moving the load_all_fuel_records() as a static method of Fuel (DRY), but it returns something different then?
+
+Q: Best way to develop logic separate from front-end? (debugging is a pain in the ass)
