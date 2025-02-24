@@ -14,7 +14,7 @@ from .company import Company
 
 class Fuel(CarmaBase, table=True):
     date: datetime
-    milage: int
+    mileage: int
     liters: float
     price: float
 
@@ -22,10 +22,10 @@ class Fuel(CarmaBase, table=True):
     company: "Company" = Relationship(back_populates="fuels", sa_relationship_kwargs={"lazy": "selectin"})
 
     @staticmethod
-    def add_fuel_record(date, milage, liters, price, company):
+    def add_fuel_record(date, mileage, liters, price, company):
         """Add new fuel record to the database"""
         with rx.session() as session:
-            new_fuel_record = Fuel(date=date, milage=milage, liters=liters, price=price, company_id=company)
+            new_fuel_record = Fuel(date=date, mileage=mileage, liters=liters, price=price, company_id=company)
             session.add(new_fuel_record)
             session.commit()
 
@@ -59,13 +59,13 @@ class Fuel(CarmaBase, table=True):
         # Extract company names and add to temp_df
         fuel_records_df["company_name"] = fuel_records_df["company"].apply(lambda x: x.name)
 
-        fuel_records_df = fuel_records_df[["date", "company_name", "milage", "liters", "price"]]
+        fuel_records_df = fuel_records_df[["date", "company_name", "mileage", "liters", "price"]]
         fuel_records_df["date"] = pd.to_datetime(fuel_records_df["date"])
         fuel_records_df["date_copy"] = fuel_records_df["date"]
         fuel_records_df.set_index("date", inplace=True)
 
         # Calculate km_driven
-        fuel_records_df["km_driven"] = fuel_records_df["milage"].diff()
+        fuel_records_df["km_driven"] = fuel_records_df["mileage"].diff()
         fuel_records_df["km_driven"] = fuel_records_df["km_driven"].fillna(0)  # First entry has no previous mileage
 
         # Calculate price_per_liter
@@ -83,7 +83,7 @@ class Fuel(CarmaBase, table=True):
             columns={
                 "date_copy": "Date",
                 "company_name": "Company",
-                "milage": "Mileage",
+                "mileage": "Mileage",
                 "liters": "Liters",
                 "price": "Price",
                 "km_driven": "KM Driven",

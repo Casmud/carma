@@ -14,7 +14,7 @@ class PartCategoryLink(rx.Model, table=True):
 class Part(CarmaBase, table=True):
     name: str
 
-    milage_interval: int | None = None
+    mileage_interval: int | None = None
     date_interval: timedelta | None = None
 
     categories: list["Category"] | None = Relationship(back_populates="parts", link_model=PartCategoryLink)

@@ -11,7 +11,7 @@ class Invoice(CarmaBase, table=True):
     date: datetime
 
     reference: int | None = None
-    milage: int | None = None
+    mileage: int | None = None
 
     company_id: int | None = Field(default=None, foreign_key="company.id")
     company: Company = Relationship()

@@ -174,11 +174,11 @@ class CreateFuelRecordDialog(rx.ComponentState):
                 fuel_records = results.all()
 
             # Validate input
-            if form_data["milage"] == "":
-                yield rx.toast.error("Milage cannot be empty")
+            if form_data["mileage"] == "":
+                yield rx.toast.error("Mileage cannot be empty")
                 valid = False
-            elif int(form_data["milage"]) < 0:
-                yield rx.toast.error("Milage cannot be negative")
+            elif int(form_data["mileage"]) < 0:
+                yield rx.toast.error("Mileage cannot be negative")
                 valid = False
             if form_data["price"] == "":
                 yield rx.toast.error("Price cannot be empty")
@@ -201,23 +201,23 @@ class CreateFuelRecordDialog(rx.ComponentState):
             # Check if previous (date) record is lower
             previous_dates = df_fuel_records.index[df_fuel_records.index < new_date]
             if not previous_dates.empty:
-                previous_milage = df_fuel_records.loc[previous_dates[-1], "milage"]
-                if int(form_data["milage"]) < previous_milage:
-                    yield rx.toast.error("Milage must be greater than the previous recorded milage.")
+                previous_mileage = df_fuel_records.loc[previous_dates[-1], "Mileage"]
+                if int(form_data["mileage"]) < previous_mileage:
+                    yield rx.toast.error("Mileage must be greater than the previous recorded mileage.")
                     valid = False
 
             # Check if next (date) record is higher
             next_dates = df_fuel_records.index[df_fuel_records.index > new_date]
             if not next_dates.empty:
-                next_milage = df_fuel_records.loc[next_dates[0], "milage"]
-                if int(form_data["milage"]) > next_milage:
-                    yield rx.toast.error("Milage must be less than the next recorded milage.")
+                next_mileage = df_fuel_records.loc[next_dates[0], "Mileage"]
+                if int(form_data["mileage"]) > next_mileage:
+                    yield rx.toast.error("Mileage must be less than the next recorded mileage.")
                     valid = False
 
             if valid is True:
                 Fuel.add_fuel_record(
                     date=form_data["date"],
-                    milage=form_data["milage"],
+                    mileage=form_data["mileage"],
                     liters=form_data["liters"],
                     price=form_data["price"],
                     company=form_data["company"],
@@ -282,9 +282,9 @@ class CreateFuelRecordDialog(rx.ComponentState):
                                     ),
                                 ),
                                 rx.vstack(
-                                    rx.text("Milage"),
+                                    rx.text("Mileage"),
                                     rc.number_input(
-                                        name="milage",
+                                        name="mileage",
                                     ),
                                 ),
                                 rx.vstack(

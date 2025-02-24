@@ -35,14 +35,14 @@ class State(rx.State):
             reader = csv.DictReader(file)
             for row in reader:
                 date = datetime.strptime(row["date"], "%m/%d/%Y")
-                milage = int(row["mileage"])
+                mileage = int(row["mileage"])
                 liters = float(row["liters"])
                 price = float(row["price"])
                 company_id = int(row["company_id"])
 
                 Fuel.add_fuel_record(
                     date=date,
-                    milage=milage,
+                    mileage=mileage,
                     liters=liters,
                     price=price,
                     company=company_id,

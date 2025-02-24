@@ -192,8 +192,8 @@ def latest_fuel_visit_card() -> rx.Component:
                 rx.data_list.value(State.latest_fuel_record.price),
             ),
             rx.data_list.item(
-                rx.data_list.label("Milage"),
-                rx.data_list.value(State.latest_fuel_record.milage),
+                rx.data_list.label("Mileage"),
+                rx.data_list.value(State.latest_fuel_record.mileage),
             ),
             align="center",
         ),
