@@ -1,0 +1,25 @@
+services:
+  backend:
+    build:
+      dockerfile: Dockerfile
+    ports:
+     - 8000:8000
+    depends_on:
+     - redis
+    volumes:
+      - db-data:/app/db
+    environment:
+      - DB_URL=sqlite:///db/carma.db
+    entrypoint: ["/bin/sh", "-c", "reflex db migrate && reflex run --env prod --backend-only --loglevel debug"]
+  frontend:
+    build:
+      dockerfile: web.Dockerfile
+    ports:
+      - 3000:80
+    depends_on:
+      - backend
+  redis:
+    image: redis
+
+volumes:
+  db-data:
